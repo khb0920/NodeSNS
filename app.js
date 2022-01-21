@@ -9,6 +9,7 @@ const morgan = require('morgan');
 
 dotenv.config();
 const v1 = require('./routes/v1');
+const v2 = require('./routes/v2');
 const authRouter = require('./routes/auth');
 const home = require('./routes');
 const { sequelize } = require('./models');
@@ -48,6 +49,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/v1', v1);
+app.use('/v2', v2);
 app.use('/auth', authRouter);
 app.use('/', home);
 
