@@ -42,7 +42,18 @@ exports.apiLimiter = RateLimit({
     handler(req, res) {
         res.status(429).json({
             code: 429,
-            message: '분당 10회만 요청가능합니다.',
+            message: '기본 사용자는 분당 10회만 요청가능합니다.',
+        });
+    },
+});
+
+exports.premiumapiLimiter = RateLimit({
+    windowMs: 60 * 1000,
+    max: 15,
+    handler(req, res) {
+        res.status(429).json({
+            code: 429,
+            message: '프리미엄사용자는 분당 15회만 요청가능합니다.',
         });
     },
 });

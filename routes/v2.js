@@ -1,12 +1,40 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const url = require('url');
 
-const { verifyToken, apiLimiter } = require('./middlewares');
+const { verifyToken, apiLimiter, premiumapiLimiter } = require('./middlewares');
 const { Domain, User, Post, Hashtag } = require('../models');
 
 const router = express.Router();
 
-router.post('/token', apiLimiter, async(req, res) => {
+router.use(async (req, res, next) => {
+    const domain = await Domain.findOne({
+        where: { host: url.parse(req.get('origin')).host },
+    }); 
+    if(domain) {
+        cors({
+            origin: req.get('origin'),
+            credentials: true,
+        })(req, res, next);
+    } else {
+        next();
+    }
+});
+
+router.use(async (req, res, next) => {
+    const domain = await Domain.findOne({
+        where: { host: url.parse(req.get('origin')).host },
+    }); 
+    console.log(domain.type);
+    if(domain.type == 'premium'){
+        premiumapiLimiter(req, res, next);
+    } else {
+        apiLimiter(req, res, next);
+    }
+});
+
+router.post('/token', async(req, res) => {
     const { clientSecret } = req.body;
     try {
         const domain = await Domain.findOne({
@@ -43,7 +71,7 @@ router.post('/token', apiLimiter, async(req, res) => {
 }
 });
 
-router.get('/test', verifyToken, apiLimiter, (req, res) => {
+router.get('/test', verifyToken, (req, res) => {
     res.json(req.decoded);
 });
 
@@ -65,7 +93,7 @@ router.get('/posts/my', apiLimiter, verifyToken,  (req, res) => {
         });
 });
 
-router.get('/posts/hashtag/:title', verifyToken, apiLimiter, async(req, res) => {
+router.get('/posts/hashtag/:title', verifyToken, async(req, res) => {
     try {
         const hashtag = await Hashtag.findOne({ where: { title: req.params.title} });
         if(!hashtag) {
@@ -79,6 +107,26 @@ router.get('/posts/hashtag/:title', verifyToken, apiLimiter, async(req, res) => 
             code: 200,
             payload: posts,
         });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            code: 500,
+            message: "서버 에러",
+        });
+    }
+});
+
+router.get('/follow', verifyToken, async(req, res) => {
+    try {
+        const user = await User.findOne({ where: { id: req.decoded.id } });
+        const following = await user.getFollowings({ attributes: ['id', 'nick'] });
+        //console.log(following);
+        const follower = await user.getFollowers({ attributes: ['id', 'nick'] });
+        return res.json({   
+            code: 200,
+            following,
+            follower,
+        }) 
     } catch (error) {
         console.error(error);
         return res.status(500).json({
