@@ -4,8 +4,11 @@ const bcrypt = require('bcrypt');
 const { isLoggedIn } = require('./middlewares');
 const User = require('../models/user');
 const Post = require('../models/post');
+const { addFollowing } = require('../testCtrl/user');
 
 const router = express.Router();
+
+router.post(':/id/follow', isLoggedIn, addFollowing);
 
 router.post('/:id/follow', isLoggedIn, async (req, res, next) => {
   try {
