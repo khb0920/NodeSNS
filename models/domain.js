@@ -15,6 +15,10 @@ module.exports = class Domain extends Sequelize.Model { //인터넷주소, 도�
                 type: Sequelize.UUID,   //충돌가능성이 매우적은 랜덤한 문자열
                 allowNull: false,
             },
+            frontSecret: {
+                type: Sequelize.UUID,
+                allowNull: false,
+            }
         }, {
             sequelize,
             timestamps: true,

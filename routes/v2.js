@@ -26,7 +26,7 @@ router.use(async (req, res, next) => {
     const domain = await Domain.findOne({
         where: { host: url.parse(req.get('origin')).host },
     }); 
-    console.log(domain.type);
+    //console.log(domain.type);
     if(domain.type == 'premium'){
         premiumapiLimiter(req, res, next);
     } else {
@@ -38,7 +38,7 @@ router.post('/token', async(req, res) => {
     const { clientSecret } = req.body;
     try {
         const domain = await Domain.findOne({
-            where: { clientSecret },
+            where: { frontSecret: clientSecret },
             include: {
                 model: User,
                 attribute: ['nick', 'id'],
