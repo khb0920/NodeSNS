@@ -116,15 +116,3 @@ describe('GET /logout', () => {
 afterAll(async () => {
     await sequelize.sync({ force: true });
 });
-// describe('POST /login', () => {             
-//     test('로그인 수행', async (done) => {
-//         request(app)                    //supertest패키지로부터 request함수를 불러와서 app을 인수로넣음
-//             .post('/auth/login')
-//             .send({                     //데이터를 send에 담아서 보냄
-//                 email: 'smr1995@naver.com',
-//                 password: '12345',
-//             })  
-//             .expect('Location', '/')    //예상되는 결과값
-//             .expect(302, done);
-//     });
-// });
