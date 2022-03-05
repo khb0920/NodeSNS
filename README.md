@@ -1,4 +1,4 @@
-# Nodejs_Practice-2-
+# NodeSNS
 <BR>
 nodejs , sequelize 기반 SNS , frontcode&amp;css made by Zerocho
 <br>
