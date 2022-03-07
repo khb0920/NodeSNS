@@ -8,14 +8,13 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const helmet = require('helmet');
 const hpp = require('hpp');
-const redis = require('redis');
-const RedisStore = require('connect-redis')(session);
-
+const cors = require('cors');
+const corsOptions = {
+    origin: "*",
+    credential: true
+};
 dotenv.config();
-const redisClient = redis.createClient({
-    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-    password: process.env.REDIS_PASSWORD,
-});
+
 const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
 const postRouter = require('./routes/post');
@@ -61,7 +60,6 @@ const sessionOption = {
         httpOnly: true,
         secure : false,
     },
-    store: new RedisStore({ client: redisClient }),
 };
 if (process.env.NODE_ENV === `production`) {
     sessionOption.proxy = true;
@@ -69,6 +67,7 @@ if (process.env.NODE_ENV === `production`) {
 app.use(session(sessionOption));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors(corsOptions));
 
 app.use('/', pageRouter);
 app.use('/auth', authRouter);
